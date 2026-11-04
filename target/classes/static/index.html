@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Palace Hotel - Modern Hotel Management System</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --dark-color: #0f172a;
+            --surface-color: #ffffff;
+            --bg-color: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+            color: white;
+            padding: 55px 0 45px 0;
+            border-radius: 0 0 28px 28px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.2);
+        }
+
+        .card-custom {
+            background: var(--surface-color);
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-custom:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card {
+            border-left: 5px solid var(--primary-color);
+            border-radius: 14px;
+        }
+
+        .nav-pills-custom .nav-link {
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 12px 20px;
+            transition: all 0.25s ease;
+        }
+
+        .nav-pills-custom .nav-link:hover {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .nav-pills-custom .nav-link.active {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .status-badge {
+            font-size: 0.78rem;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-available { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-occupied { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-maintenance { background-color: #fef9c3; color: #854d0e; border: 1px solid #fef08a; }
+        
+        .badge-pending { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-confirmed { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-cancelled { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .badge-completed { background-color: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
+
+        .room-item-card {
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+        .room-item-card:hover {
+            border-color: #93c5fd;
+            background-color: #f8fafc;
+        }
+        .room-item-card.selected {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+        }
+
+        .stock-box {
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 10px 14px;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printableInvoice, #printableInvoice * { visibility: visible; }
+            #printableInvoice { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-white fw-bold d-flex align-items-center" href="#">
+                <span class="p-2 bg-primary rounded-3 me-2 d-inline-flex align-items-center justify-content-center" style="width:36px;height:36px;">
+                    <i class="bi bi-building text-white"></i>
+                </span>
+                <span>Grand Palace Hotel</span>
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span id="userGreeting" class="navbar-text text-light fw-medium small"></span>
+                <div id="authButtons" class="d-flex gap-2">
+                    <button class="btn btn-outline-light btn-sm px-3 rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="bi bi-box-arrow-in-right"></i> Masuk
+                    </button>
+                    <button class="btn btn-primary btn-sm px-3 rounded-pill fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        <i class="bi bi-person-plus"></i> Daftar
+                    </button>
+                </div>
+                <div id="userMenu" class="dropdown d-none">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1"></i> <span id="userMenuName">Akun</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                        <li><a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="bi bi-gear me-2"></i> Pengaturan Profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item py-2 text-danger" href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i> Keluar</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <div class="hero-banner">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-white text-primary px-3 py-1 rounded-pill fw-semibold mb-2 shadow-sm">
+                        <i class="bi bi-stars"></i> UTS PBO - Spring Boot REST API
+                    </span>
+                    <h1 class="fw-extrabold display-6">Sistem Manajemen & Reservasi Hotel</h1>
+                    <p class="text-light opacity-75 mb-0 fs-6">
+                        Manajemen stok kamar real-time, penambahan stok masal per tipe kamar, serta alur persetujuan reservasi (Accept / Reject) oleh Admin.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-10 d-inline-block text-start">
+                        <div class="small text-white-50"><i class="bi bi-calendar-event"></i> Tanggal Sistem:</div>
+                        <div class="fw-bold fs-5 text-white" id="currentDateDisplay">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="container pb-5">
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-pills nav-pills-custom nav-fill bg-white p-2 rounded-4 card-custom mb-4" id="mainTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                    <i class="bi bi-grid-1x2 me-1"></i> Tipe Kamar & Stok
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="booking-tab" data-bs-toggle="tab" data-bs-target="#booking" type="button" role="tab">
+                    <i class="bi bi-calendar-check me-1"></i> Reservasi Kamar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rooms-tab" data-bs-toggle="tab" data-bs-target="#rooms" type="button" role="tab">
+                    <i class="bi bi-door-open me-1"></i> Daftar Unit Kamar
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
+                    <i class="bi bi-receipt-cutoff me-1"></i> Riwayat & Persetujuan
+                </button>
+            </li>
+            <!-- TAB ADMIN ONLY (DI-HIDE TOTAL UNTUK GUEST/CUSTOMER) -->
+            <li class="nav-item d-none" id="adminUsersTabItem" role="presentation">
+                <button class="nav-link text-danger" id="admin-users-tab" data-bs-toggle="tab" data-bs-target="#admin-users" type="button" role="tab">
+                    <i class="bi bi-shield-lock-fill me-1"></i> Data Pengguna
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Contents -->
+        <div class="tab-content" id="mainTabContent">
+
+            <!-- TAB 1: OVERVIEW, TIPE KAMAR & KONTROL STOK -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+
+                <!-- Admin Analytics Widget -->
+                <div id="adminAnalyticsSection" class="d-none mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold m-0"><i class="bi bi-speedometer2 text-primary"></i> Ringkasan Eksekutif Hotel</h5>
+                        <button class="btn btn-sm btn-outline-primary rounded-pill" onclick="loadStats()"><i class="bi bi-arrow-clockwise"></i> Perbarui</button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="card-custom p-3 stat-card">
+                                <div class="text-muted small fw-semibold">TOTAL PENDAPATAN</div>
+                                <h4 class="fw-bold text-success my-1" id="statRevenue">Rp 0</h4>
+                                <small class="text-muted">Dari booking terkonfirmasi</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card-custom p-3 stat-card" style="border-left-color: #f59e0b;">
+                                <div class="text-muted small fw-semibold">MENUNGGU ACC (PENDING)</div>
+                                <h4 class="fw-bold text-warning my-1" id="statPendingBookings">0</h4>
+                                <small class="text-muted">Perlu konfirmasi admin</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card-custom p-3 stat-card" style="border-left-color: #3b82f6;">
+                                <div class="text-muted small fw-semibold">TOTAL BOOKING</div>
+                                <h4 class="fw-bold text-primary my-1" id="statBookings">0</h4>
+                                <small class="text-muted"><span id="statActiveBookings">0</span> disetujui</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card-custom p-3 stat-card" style="border-left-color: #10b981;">
+                                <div class="text-muted small fw-semibold">TOTAL STOK KAMAR</div>
+                                <h4 class="fw-bold text-dark my-1" id="statTotalStock">0 Unit</h4>
+                                <small class="text-muted"><span id="statAvailableRooms">0</span> tersedia saat ini</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tipe Kamar & Rincian Stok -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                    <div>
+                        <h4 class="fw-bold m-0">Tipe Kamar & Ketersediaan Stok</h4>
+                        <p class="text-muted small mb-0">Rincian jumlah stok unit kamar untuk masing-masing kelas kamar</p>
+                    </div>
+                    <!-- Admin Actions -->
+                    <div id="adminTierActions" class="d-flex gap-2 d-none">
+                        <button class="btn btn-success btn-sm rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#bulkStockModal">
+                            <i class="bi bi-box-seam"></i> Tambah Stok Masal
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm rounded-pill fw-semibold" data-bs-toggle="modal" data-bs-target="#tierModal" onclick="resetTierForm()">
+                            <i class="bi bi-plus-circle"></i> Tambah Tipe Kamar
+                        </button>
+                    </div>
+                </div>
+                <div class="row g-4" id="tierCards"></div>
+            </div>
+
+            <!-- TAB 2: SMART BOOKING ENGINE -->
+            <div class="tab-pane fade" id="booking" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <div class="card-custom p-4 sticky-top" style="top: 90px;">
+                            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-calendar2-range"></i> Cari & Pesan Kamar</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">1. Pilih Rentang Tanggal Menginap</label>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label text-muted small">Check-in</label>
+                                        <input type="date" id="bookCheckIn" class="form-control form-control-sm" onchange="fetchAvailableRoomsByDate()">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label text-muted small">Check-out</label>
+                                        <input type="date" id="bookCheckOut" class="form-control form-control-sm" onchange="fetchAvailableRoomsByDate()">
+                                    </div>
+                                </div>
+                                <div id="dateNotice" class="small text-muted mt-2">
+                                    <i class="bi bi-info-circle"></i> Durasi: <span id="stayNightsText" class="fw-bold text-primary">1</span> Malam
+                                </div>
+                            </div>
+
+                            <hr class="my-3 text-muted">
+
+                            <div class="p-3 bg-light rounded-3 mb-3">
+                                <h6 class="fw-bold small mb-2 text-uppercase text-secondary">Rincian Pembayaran</h6>
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Kamar Terpilih:</span>
+                                    <span id="calcRoomCount" class="fw-semibold text-dark">0 Kamar</span>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Tarif Kamar / Malam:</span>
+                                    <span id="calcRatePerNight" class="fw-semibold text-dark">Rp 0</span>
+                                </div>
+                                <div class="d-flex justify-content-between small text-muted mb-2">
+                                    <span>Lama Menginap:</span>
+                                    <span id="calcNights" class="fw-semibold text-dark">1 Malam</span>
+                                </div>
+                                <div class="d-flex justify-content-between border-top pt-2 fw-bold text-dark fs-6">
+                                    <span>Total Estimasi:</span>
+                                    <span id="calcGrandTotal" class="text-primary">Rp 0</span>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info py-2 px-3 small rounded-3 mb-3">
+                                <i class="bi bi-shield-check"></i> Setiap reservasi akan berstatus <b>PENDING</b> terlebih dahulu untuk ditinjau dan dikonfirmasi (Accept / Reject) oleh pihak Admin.
+                            </div>
+
+                            <button id="btnConfirmBooking" class="btn btn-primary w-100 py-2 fw-bold rounded-pill shadow-sm" onclick="submitReservation()">
+                                <i class="bi bi-send-check me-1"></i> Ajukan Reservasi (Pending)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="card-custom p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 class="fw-bold m-0"><i class="bi bi-check2-circle text-success"></i> 2. Pilih Unit Kamar</h5>
+                                    <small class="text-muted">Kamar terverifikasi tersedia tanpa bentrok jadwal</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill px-3 py-2" id="availableCountBadge">Memuat...</span>
+                            </div>
+
+                            <div class="row g-3" id="availableRoomsContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: DAFTAR UNIT KAMAR & CRUD STOK ADMIN -->
+            <div class="tab-pane fade" id="rooms" role="tabpanel">
+                <div class="card-custom p-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                        <div>
+                            <h4 class="fw-bold m-0">Inventaris Semua Unit Kamar</h4>
+                            <small class="text-muted">Daftar semua unit kamar, nomor pintu, dan status operasional</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="text" id="searchRoomNumber" class="form-control form-control-sm rounded-pill px-3" placeholder="Cari No. Kamar..." onkeyup="filterRoomsTable()" style="max-width: 170px;">
+                            <select id="filterRoomStatus" class="form-select form-select-sm rounded-pill" onchange="filterRoomsTable()" style="width: auto;">
+                                <option value="">Semua Status</option>
+                                <option value="AVAILABLE">AVAILABLE (Tersedia)</option>
+                                <option value="OCCUPIED">OCCUPIED (Terisi)</option>
+                                <option value="MAINTENANCE">MAINTENANCE (Perbaikan)</option>
+                            </select>
+                            <!-- Tombol Tambah Kamar: Khusus Admin -->
+                            <button id="btnTambahKamar" class="btn btn-primary btn-sm rounded-pill fw-semibold d-none" data-bs-toggle="modal" data-bs-target="#roomModal" onclick="resetRoomForm()">
+                                <i class="bi bi-plus-circle"></i> Tambah Kamar Satuan
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>No Kamar</th>
+                                    <th>Tipe Kamar</th>
+                                    <th>Kapasitas</th>
+                                    <th>Harga / Malam</th>
+                                    <th>Status Terkini</th>
+                                    <th id="thAksiStok" class="d-none text-end">Aksi Stok (Admin)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roomsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: RIWAYAT & PERSETUJUAN RESERVASI -->
+            <div class="tab-pane fade" id="history" role="tabpanel">
+                <div class="card-custom p-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+                        <div>
+                            <h4 class="fw-bold m-0">Riwayat Reservasi & Status Persetujuan</h4>
+                            <small class="text-muted" id="historySubText">Semua catatan pesanan menginap</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="searchBookingCode" class="form-control form-control-sm rounded-pill px-3" placeholder="Cari Kode Booking / Tamu..." onkeyup="filterHistoryTable()">
+                            <span id="historyRoleBadge" class="badge bg-secondary rounded-pill px-3 py-2 d-flex align-items-center"></span>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Kode Booking</th>
+                                    <th>Nama Tamu</th>
+                                    <th>Periode Menginap</th>
+                                    <th>Total Biaya</th>
+                                    <th>Status Pesanan</th>
+                                    <th class="text-end">Aksi & Persetujuan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: MANAJEMEN USER (ADMIN ONLY) -->
+            <div class="tab-pane fade" id="admin-users" role="tabpanel">
+                <div class="card-custom p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="fw-bold m-0 text-danger"><i class="bi bi-shield-lock-fill"></i> Manajemen Pengguna & Hak Akses</h4>
+                            <small class="text-muted">Kelola akun customer dan buat staff/admin baru</small>
+                        </div>
+                        <button class="btn btn-success btn-sm rounded-pill fw-semibold px-3" data-bs-toggle="modal" data-bs-target="#adminAddUserModal">
+                            <i class="bi bi-person-plus-fill"></i> Tambah User / Admin
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Peran (Role)</th>
+                                    <th>Terdaftar Pada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL: TAMBAH STOK MASAL (BULK STOCK) - ADMIN ONLY -->
+    <div class="modal fade" id="bulkStockModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-box-seam-fill text-success"></i> Tambah Stok Kamar Masal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bulkStockForm" onsubmit="handleBulkStock(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Pilih Tipe Kamar Target</label>
+                            <select id="bulkTierSelect" class="form-select rounded-3" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Jumlah Kamar yang Ingin Ditambahkan (Stok)</label>
+                            <input type="number" id="bulkCount" class="form-control rounded-3" value="4" min="1" max="50" required>
+                            <small class="text-muted">Contoh: Tambah 4 kamar atau 5 kamar sekaligus</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Awalan Nomor Kamar (Opsional)</label>
+                            <input type="text" id="bulkPrefix" class="form-control rounded-3" placeholder="Contoh: A, B, atau kosongkan untuk nomor numerik">
+                            <small class="text-muted">Jika diisi 'A', nomor kamar akan dibuat: A-01, A-02, dst.</small>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold">
+                            <i class="bi bi-plus-lg"></i> Tambahkan Stok Sekarang
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: INVOICE PRINT VIEW -->
+    <div class="modal fade" id="invoiceModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom p-3 border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-bold text-primary m-0"><i class="bi bi-receipt"></i> Bukti Reservasi Hotel</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="printableInvoice">
+                    <div class="text-center pb-3 border-bottom mb-3">
+                        <h4 class="fw-bold mb-0">GRAND PALACE HOTEL</h4>
+                        <small class="text-muted">Jl. Pusat Kota No. 101, Indonesia | Telp: (021) 555-8899</small>
+                    </div>
+                    <div class="row g-2 small mb-3">
+                        <div class="col-6">
+                            <div class="text-muted">KODE BOOKING</div>
+                            <div class="fw-bold fs-6 text-primary" id="invCode">-</div>
+                        </div>
+                        <div class="col-6 text-end">
+                            <div class="text-muted">STATUS PESANAN</div>
+                            <span class="badge" id="invStatus">-</span>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">NAMA TAMU</div>
+                            <div class="fw-semibold text-dark" id="invGuestName">-</div>
+                        </div>
+                        <div class="col-6 text-end">
+                            <div class="text-muted">EMAIL TAMU</div>
+                            <div class="fw-semibold text-dark" id="invGuestEmail">-</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted">CHECK-IN</div>
+                            <div class="fw-bold" id="invCheckIn">-</div>
+                        </div>
+                        <div class="col-6 text-end">
+                            <div class="text-muted">CHECK-OUT</div>
+                            <div class="fw-bold" id="invCheckOut">-</div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm border small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Kamar</th>
+                                    <th>Tipe</th>
+                                    <th class="text-end">Tarif / Malam</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invItemsTable"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">TOTAL PEMBAYARAN:</span>
+                        <span class="fw-bold fs-5 text-primary" id="invTotalAmount">Rp 0</span>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Tutup</button>
+                    <button class="btn btn-primary btn-sm rounded-pill fw-semibold" onclick="window.print()"><i class="bi bi-printer"></i> Cetak / Simpan PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TAMBAH / EDIT TIPE KAMAR (ADMIN ONLY) -->
+    <div class="modal fade" id="tierModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="tierModalTitle"><i class="bi bi-stars text-primary"></i> Kelola Tipe Kamar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tierForm" onsubmit="handleSaveTier(event)">
+                        <input type="hidden" id="tierId">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nama Tipe Kamar</label>
+                            <input type="text" id="tierName" class="form-control rounded-3" placeholder="Contoh: President Suite" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Harga Dasar / Malam (Rp)</label>
+                                <input type="number" id="tierPrice" class="form-control rounded-3" placeholder="500000" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Kapasitas (Orang)</label>
+                                <input type="number" id="tierCapacity" class="form-control rounded-3" value="2" required min="1">
+                            </div>
+                        </div>
+                        <div class="mb-3" id="initialStockGroup">
+                            <label class="form-label small fw-bold">Jumlah Stok Kamar Awal (Opsional)</label>
+                            <input type="number" id="tierInitialStock" class="form-control rounded-3" value="4" min="0" placeholder="Misal: 4 atau 5 unit">
+                            <small class="text-muted">Sistem akan otomatis membuatkan nomor kamar sebanyak jumlah ini</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Deskripsi Fasilitas</label>
+                            <textarea id="tierDescription" class="form-control rounded-3" rows="3" placeholder="Fasilitas kamar..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Simpan Tipe Kamar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TAMBAH / EDIT UNIT KAMAR (ADMIN ONLY) -->
+    <div class="modal fade" id="roomModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="roomModalTitle"><i class="bi bi-door-open-fill text-primary"></i> Kelola Unit Kamar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="roomForm" onsubmit="handleSaveRoom(event)">
+                        <input type="hidden" id="editRoomId">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nomor Kamar</label>
+                            <input type="text" id="modalRoomNumber" class="form-control rounded-3" placeholder="Contoh: 104, 203" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Pilih Tipe Kamar</label>
+                            <select id="modalRoomTierSelect" class="form-select rounded-3" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Status Operasional</label>
+                            <select id="modalRoomStatus" class="form-select rounded-3">
+                                <option value="AVAILABLE">AVAILABLE (Tersedia)</option>
+                                <option value="OCCUPIED">OCCUPIED (Terisi)</option>
+                                <option value="MAINTENANCE">MAINTENANCE (Perbaikan)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold" id="btnSaveRoom">Simpan Unit Kamar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TAMBAH USER / ADMIN BARU OLEH ADMIN -->
+    <div class="modal fade" id="adminAddUserModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-fill-gear text-success"></i> Buat Pengguna Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="adminAddUserForm" onsubmit="handleAdminAddUser(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nama Lengkap</label>
+                            <input type="text" id="adminUserFullName" class="form-control rounded-3" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Username</label>
+                                <input type="text" id="adminUserUsername" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Email</label>
+                                <input type="email" id="adminUserEmail" class="form-control rounded-3" required>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Password</label>
+                                <input type="password" id="adminUserPassword" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Peran (Role)</label>
+                                <select id="adminUserRole" class="form-select rounded-3" required>
+                                    <option value="CUSTOMER">CUSTOMER (Tamu)</option>
+                                    <option value="ADMIN">ADMIN (Staff Pengelola)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 rounded-pill fw-bold">Simpan Pengguna</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PROFIL USER -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-bounding-box text-primary"></i> Pengaturan Akun Saya</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm" onsubmit="handleUpdateProfile(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Username (Permanen)</label>
+                            <input type="text" id="profileUsername" class="form-control rounded-3 bg-light" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nama Lengkap</label>
+                            <input type="text" id="profileFullName" class="form-control rounded-3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Alamat Email</label>
+                            <input type="email" id="profileEmail" class="form-control rounded-3" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Ganti Password (Kosongkan jika tidak ingin ganti)</label>
+                            <input type="password" id="profilePassword" class="form-control rounded-3" placeholder="Minimal 4 karakter">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTRASI MANDIRI (CUSTOMER ONLY) -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus text-primary"></i> Daftar Akun Tamu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm" onsubmit="handleCustomerRegister(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nama Lengkap</label>
+                            <input type="text" id="regFullName" class="form-control rounded-3" placeholder="Nama Anda" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Username</label>
+                                <input type="text" id="regUsername" class="form-control rounded-3" placeholder="username" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Email</label>
+                                <input type="email" id="regEmail" class="form-control rounded-3" placeholder="email@tamu.com" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Password</label>
+                            <input type="password" id="regPassword" class="form-control rounded-3" placeholder="Minimal 4 karakter" required>
+                        </div>
+                        <div id="registerAlert" class="alert alert-danger d-none small"></div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Daftar Sekarang</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: LOGIN -->
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom border-0">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-box-arrow-in-right text-primary"></i> Masuk ke Akun Anda</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Username</label>
+                            <input type="text" id="loginUsername" class="form-control rounded-3" placeholder="admin / john_doe" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Password</label>
+                            <input type="password" id="loginPassword" class="form-control rounded-3" placeholder="password123" required>
+                        </div>
+                        <div id="loginAlert" class="alert alert-danger d-none small"></div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Masuk</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core App Logic -->
+    <script>
+        const API_BASE = '/api';
+        let currentUser = null;
+        let tiersList = [];
+        let allRoomsList = [];
+        let availableRoomsForDatesList = [];
+        let selectedRoomIds = new Set();
+        let allHistoryList = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            document.getElementById('currentDateDisplay').textContent = today.toLocaleDateString('id-ID', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            const checkInStr = today.toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 86400000);
+            const checkOutStr = tomorrow.toISOString().split('T')[0];
+
+            document.getElementById('bookCheckIn').min = checkInStr;
+            document.getElementById('bookCheckIn').value = checkInStr;
+            document.getElementById('bookCheckOut').min = checkOutStr;
+            document.getElementById('bookCheckOut').value = checkOutStr;
+
+            checkSession();
+            loadTiers();
+            fetchAvailableRoomsByDate();
+            loadRooms();
+            loadReservations();
+        });
+
+        // ================= AUTH & SESSION =================
+        async function checkSession() {
+            try {
+                const res = await fetch(`${API_BASE}/users/me`);
+                if (res.ok) {
+                    currentUser = await res.json();
+                } else {
+                    currentUser = null;
+                }
+            } catch (e) {
+                currentUser = null;
+            }
+            updateUserUI();
+        }
+
+        function updateUserUI() {
+            const greeting = document.getElementById('userGreeting');
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userMenuName = document.getElementById('userMenuName');
+            const adminUsersTab = document.getElementById('adminUsersTabItem');
+            const adminTierActions = document.getElementById('adminTierActions');
+            const btnTambahKamar = document.getElementById('btnTambahKamar');
+            const thAksiStok = document.getElementById('thAksiStok');
+            const adminAnalytics = document.getElementById('adminAnalyticsSection');
+
+            const isAdmin = currentUser && currentUser.role === 'ADMIN';
+
+            if (currentUser) {
+                authButtons.classList.add('d-none');
+                userMenu.classList.remove('d-none');
+                userMenuName.textContent = currentUser.fullName;
+
+                const roleBadge = isAdmin 
+                    ? '<span class="badge bg-danger ms-1">ADMIN</span>' 
+                    : '<span class="badge bg-primary ms-1">CUSTOMER</span>';
+                greeting.innerHTML = `Selamat datang, <b>${currentUser.fullName}</b> ${roleBadge}`;
+
+                document.getElementById('profileUsername').value = currentUser.username;
+                document.getElementById('profileFullName').value = currentUser.fullName;
+                document.getElementById('profileEmail').value = currentUser.email;
+
+                if (isAdmin) {
+                    adminUsersTab.classList.remove('d-none');
+                    adminTierActions.classList.remove('d-none');
+                    btnTambahKamar.classList.remove('d-none');
+                    thAksiStok.classList.remove('d-none');
+                    adminAnalytics.classList.remove('d-none');
+                    loadStats();
+                    loadUsers();
+                } else {
+                    adminUsersTab.classList.add('d-none');
+                    adminTierActions.classList.add('d-none');
+                    btnTambahKamar.classList.add('d-none');
+                    thAksiStok.classList.add('d-none');
+                    adminAnalytics.classList.add('d-none');
+                    if (document.getElementById('admin-users-tab').classList.contains('active')) {
+                        document.getElementById('overview-tab').click();
+                    }
+                }
+            } else {
+                greeting.textContent = 'Mode Tamu (Belum Masuk)';
+                authButtons.classList.remove('d-none');
+                userMenu.classList.add('d-none');
+                adminUsersTab.classList.add('d-none');
+                adminTierActions.classList.add('d-none');
+                btnTambahKamar.classList.add('d-none');
+                thAksiStok.classList.add('d-none');
+                adminAnalytics.classList.add('d-none');
+                if (document.getElementById('admin-users-tab').classList.contains('active')) {
+                    document.getElementById('overview-tab').click();
+                }
+            }
+
+            renderRoomsTable();
+            loadReservations();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const alertBox = document.getElementById('loginAlert');
+
+            try {
+                const res = await fetch(`${API_BASE}/users/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    updateUserUI();
+                    bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+                    alertBox.classList.add('d-none');
+                } else {
+                    const err = await res.json();
+                    alertBox.textContent = err.message || 'Login gagal';
+                    alertBox.classList.remove('d-none');
+                }
+            } catch (err) {
+                alertBox.textContent = 'Gagal menghubungi server';
+                alertBox.classList.remove('d-none');
+            }
+        }
+
+        async function handleCustomerRegister(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('regFullName').value;
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const alertBox = document.getElementById('registerAlert');
+
+            try {
+                const res = await fetch(`${API_BASE}/users/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, username, email, password })
+                });
+
+                if (res.ok) {
+                    alert('Pendaftaran akun berhasil! Silakan masuk.');
+                    document.getElementById('registerForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('registerModal')).hide();
+                    alertBox.classList.add('d-none');
+                    new bootstrap.Modal(document.getElementById('loginModal')).show();
+                } else {
+                    const err = await res.json();
+                    alertBox.textContent = err.message || 'Pendaftaran gagal';
+                    alertBox.classList.remove('d-none');
+                }
+            } catch (err) {
+                alertBox.textContent = 'Terjadi kesalahan sistem';
+                alertBox.classList.remove('d-none');
+            }
+        }
+
+        async function handleUpdateProfile(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('profileFullName').value;
+            const email = document.getElementById('profileEmail').value;
+            const password = document.getElementById('profilePassword').value;
+
+            const body = { fullName, email };
+            if (password && password.length >= 4) body.password = password;
+
+            try {
+                const res = await fetch(`${API_BASE}/users/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (res.ok) {
+                    currentUser = await res.json();
+                    updateUserUI();
+                    alert('Profil berhasil diperbarui!');
+                    bootstrap.Modal.getInstance(document.getElementById('profileModal')).hide();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Gagal memperbarui profil');
+                }
+            } catch (e) {
+                alert('Kesalahan koneksi');
+            }
+        }
+
+        async function logout() {
+            await fetch(`${API_BASE}/users/logout`, { method: 'POST' });
+            currentUser = null;
+            updateUserUI();
+        }
+
+        // ================= 1. TIPE KAMAR & RINGKASAN STOK =================
+        async function loadTiers() {
+            const res = await fetch(`${API_BASE}/room-tiers/stock-summary`);
+            tiersList = await res.json();
+            const container = document.getElementById('tierCards');
+            const selectTier = document.getElementById('modalRoomTierSelect');
+            const bulkTierSelect = document.getElementById('bulkTierSelect');
+
+            container.innerHTML = '';
+            selectTier.innerHTML = '';
+            bulkTierSelect.innerHTML = '';
+
+            const isAdmin = currentUser && currentUser.role === 'ADMIN';
+
+            tiersList.forEach(t => {
+                selectTier.innerHTML += `<option value="${t.tierId}">${t.tierName}</option>`;
+                bulkTierSelect.innerHTML += `<option value="${t.tierId}">${t.tierName} (Stok Saat Ini: ${t.totalStock} Kamar)</option>`;
+
+                let adminTierButtons = '';
+                if (isAdmin) {
+                    adminTierButtons = `
+                        <div class="mt-3 pt-2 border-top d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-success rounded-pill w-100" onclick="openBulkStockForTier(${t.tierId})">
+                                <i class="bi bi-plus-circle"></i> +Stok
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill w-100" onclick="openEditTier(${t.tierId})">
+                                <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="deleteTier(${t.tierId})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="col-md-4">
+                        <div class="card-custom h-100 p-4 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h5 class="fw-bold text-dark m-0">${t.tierName}</h5>
+                                    <span class="badge bg-light text-primary border rounded-pill px-2.5 py-1.5"><i class="bi bi-people"></i> ${t.capacity} Orang</span>
+                                </div>
+                                <h3 class="fw-bold text-primary my-2">Rp ${Number(t.basePrice).toLocaleString('id-ID')} <span class="fs-6 text-muted fw-normal">/ malam</span></h3>
+                                
+                                <!-- Box Status Stok Tiap Tipe Kamar -->
+                                <div class="stock-box my-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="small fw-bold text-secondary">Total Unit Kamar:</span>
+                                        <span class="badge bg-dark rounded-pill">${t.totalStock} Unit</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                                        <span><i class="bi bi-check-circle-fill text-success"></i> Tersedia: <b>${t.availableStock}</b></span>
+                                        <span><i class="bi bi-person-fill text-danger"></i> Terisi: <b>${t.occupiedStock}</b></span>
+                                        <span><i class="bi bi-tools text-warning"></i> Perbaikan: <b>${t.maintenanceStock}</b></span>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted small mt-2 mb-0">${t.description || 'Kenyamanan kamar eksklusif dengan perlengkapan lengkap.'}</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm rounded-pill w-100 mt-3 fw-semibold" onclick="selectTierAndBook(${t.tierId})">
+                                    <i class="bi bi-calendar-plus"></i> Booking Tipe Ini
+                                </button>
+                                ${adminTierButtons}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function selectTierAndBook(tierId) {
+            document.getElementById('booking-tab').click();
+        }
+
+        function resetTierForm() {
+            document.getElementById('tierModalTitle').innerHTML = '<i class="bi bi-stars text-primary"></i> Tambah Tipe Kamar Baru';
+            document.getElementById('tierId').value = '';
+            document.getElementById('tierForm').reset();
+            document.getElementById('initialStockGroup').classList.remove('d-none');
+        }
+
+        function openEditTier(id) {
+            const tier = tiersList.find(t => t.tierId === id);
+            if (!tier) return;
+            document.getElementById('tierModalTitle').innerHTML = '<i class="bi bi-pencil text-primary"></i> Edit Tipe Kamar';
+            document.getElementById('tierId').value = tier.tierId;
+            document.getElementById('tierName').value = tier.tierName;
+            document.getElementById('tierPrice').value = tier.basePrice;
+            document.getElementById('tierCapacity').value = tier.capacity;
+            document.getElementById('tierDescription').value = tier.description || '';
+            document.getElementById('initialStockGroup').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('tierModal')).show();
+        }
+
+        async function handleSaveTier(e) {
+            e.preventDefault();
+            const id = document.getElementById('tierId').value;
+            const tierName = document.getElementById('tierName').value;
+            const basePrice = document.getElementById('tierPrice').value;
+            const capacity = document.getElementById('tierCapacity').value;
+            const description = document.getElementById('tierDescription').value;
+            const initialStock = document.getElementById('tierInitialStock').value;
+
+            const url = id ? `${API_BASE}/room-tiers/${id}` : `${API_BASE}/room-tiers`;
+            const method = id ? 'PUT' : 'POST';
+
+            const payload = { tierName, basePrice, capacity, description };
+            if (!id && initialStock) {
+                payload.initialStock = parseInt(initialStock);
+            }
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert('Tipe kamar dan stok berhasil disimpan!');
+                    bootstrap.Modal.getInstance(document.getElementById('tierModal')).hide();
+                    loadTiers();
+                    loadRooms();
+                    if (currentUser && currentUser.role === 'ADMIN') loadStats();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Gagal menyimpan');
+                }
+            } catch (e) {
+                alert('Kesalahan koneksi');
+            }
+        }
+
+        function openBulkStockForTier(tierId) {
+            document.getElementById('bulkTierSelect').value = tierId;
+            new bootstrap.Modal(document.getElementById('bulkStockModal')).show();
+        }
+
+        async function handleBulkStock(e) {
+            e.preventDefault();
+            const tierId = document.getElementById('bulkTierSelect').value;
+            const count = document.getElementById('bulkCount').value;
+            const prefix = document.getElementById('bulkPrefix').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/rooms/add-stock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tierId, count, prefix })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    alert(data.message || 'Stok berhasil ditambahkan!');
+                    document.getElementById('bulkStockForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('bulkStockModal')).hide();
+                    loadTiers();
+                    loadRooms();
+                    fetchAvailableRoomsByDate();
+                    if (currentUser && currentUser.role === 'ADMIN') loadStats();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Gagal menambahkan stok');
+                }
+            } catch (e) {
+                alert('Kesalahan jaringan');
+            }
+        }
+
+        async function deleteTier(id) {
+            if (!confirm('Yakin ingin menghapus tipe kamar ini?')) return;
+            const res = await fetch(`${API_BASE}/room-tiers/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadTiers();
+                loadRooms();
+                if (currentUser && currentUser.role === 'ADMIN') loadStats();
+            } else {
+                const err = await res.json();
+                alert(err.message || 'Gagal menghapus');
+            }
+        }
+
+        // ================= 2. BOOKING ENGINE =================
+        async function fetchAvailableRoomsByDate() {
+            const checkIn = document.getElementById('bookCheckIn').value;
+            const checkOut = document.getElementById('bookCheckOut').value;
+
+            if (!checkIn || !checkOut) return;
+
+            const inDate = new Date(checkIn);
+            const outDate = new Date(checkOut);
+            const diffTime = outDate - inDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 0) {
+                alert('Tanggal Check-out harus setelah Check-in!');
+                return;
+            }
+
+            document.getElementById('stayNightsText').textContent = diffDays;
+            document.getElementById('calcNights').textContent = diffDays + ' Malam';
+
+            try {
+                const res = await fetch(`${API_BASE}/rooms/available-dates?checkIn=${checkIn}&checkOut=${checkOut}`);
+                if (res.ok) {
+                    availableRoomsForDatesList = await res.json();
+                    selectedRoomIds.forEach(id => {
+                        if (!availableRoomsForDatesList.some(r => r.id === id)) {
+                            selectedRoomIds.delete(id);
+                        }
+                    });
+                    renderAvailableRoomsCards();
+                    updatePriceCalculator(diffDays);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderAvailableRoomsCards() {
+            const container = document.getElementById('availableRoomsContainer');
+            const badge = document.getElementById('availableCountBadge');
+            container.innerHTML = '';
+
+            badge.textContent = `${availableRoomsForDatesList.length} Kamar Tersedia`;
+
+            if (availableRoomsForDatesList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                        <p class="text-muted mt-2">Tidak ada kamar yang tersedia pada rentang tanggal tersebut.<br>Silakan pilih tanggal lain.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            availableRoomsForDatesList.forEach(r => {
+                const isSelected = selectedRoomIds.has(r.id);
+                container.innerHTML += `
+                    <div class="col-md-6">
+                        <div class="card p-3 room-item-card ${isSelected ? 'selected' : ''}" onclick="toggleSelectRoom(${r.id})">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold fs-5 text-dark">Kamar ${r.roomNumber}</span>
+                                <span class="badge ${isSelected ? 'bg-primary' : 'bg-light text-muted border'} rounded-pill">
+                                    ${isSelected ? '<i class="bi bi-check-lg"></i> Terpilih' : 'Klik Pilih'}
+                                </span>
+                            </div>
+                            <div class="text-primary fw-semibold small mt-1">${r.tier.tierName}</div>
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                <small class="text-muted"><i class="bi bi-person"></i> ${r.tier.capacity} Orang</small>
+                                <span class="fw-bold text-dark">Rp ${Number(r.tier.basePrice).toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleSelectRoom(roomId) {
+            if (selectedRoomIds.has(roomId)) {
+                selectedRoomIds.delete(roomId);
+            } else {
+                selectedRoomIds.add(roomId);
+            }
+            renderAvailableRoomsCards();
+
+            const checkIn = new Date(document.getElementById('bookCheckIn').value);
+            const checkOut = new Date(document.getElementById('bookCheckOut').value);
+            const diffDays = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            updatePriceCalculator(diffDays);
+        }
+
+        function updatePriceCalculator(nights) {
+            const count = selectedRoomIds.size;
+            let totalPerNight = 0;
+
+            selectedRoomIds.forEach(id => {
+                const room = availableRoomsForDatesList.find(r => r.id === id);
+                if (room) {
+                    totalPerNight += Number(room.tier.basePrice);
+                }
+            });
+
+            const grandTotal = totalPerNight * nights;
+
+            document.getElementById('calcRoomCount').textContent = `${count} Unit Kamar`;
+            document.getElementById('calcRatePerNight').textContent = `Rp ${totalPerNight.toLocaleString('id-ID')}`;
+            document.getElementById('calcGrandTotal').textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+        }
+
+        async function submitReservation() {
+            if (!currentUser) {
+                alert('Silakan login terlebih dahulu untuk melakukan reservasi!');
+                new bootstrap.Modal(document.getElementById('loginModal')).show();
+                return;
+            }
+
+            if (selectedRoomIds.size === 0) {
+                alert('Pilih minimal 1 kamar yang tersedia!');
+                return;
+            }
+
+            const checkInDate = document.getElementById('bookCheckIn').value;
+            const checkOutDate = document.getElementById('bookCheckOut').value;
+
+            const body = {
+                userId: currentUser.id,
+                checkInDate,
+                checkOutDate,
+                roomIds: Array.from(selectedRoomIds)
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/reservations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (res.ok) {
+                    const saved = await res.json();
+                    alert(`Reservasi berhasil diajukan!\nKode Booking: ${saved.bookingCode}\nStatus: PENDING (Menunggu ditinjau dan disetujui Admin).`);
+                    selectedRoomIds.clear();
+                    fetchAvailableRoomsByDate();
+                    loadRooms();
+                    loadReservations();
+                    loadTiers();
+                    document.getElementById('history-tab').click();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Gagal mengajukan booking');
+                }
+            } catch (e) {
+                alert('Kesalahan koneksi');
+            }
+        }
+
+        // ================= 3. CRUD STOK UNIT KAMAR =================
+        async function loadRooms() {
+            try {
+                const res = await fetch(`${API_BASE}/rooms`);
+                allRoomsList = await res.json();
+                renderRoomsTable();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderRoomsTable() {
+            const tbody = document.getElementById('roomsTableBody');
+            tbody.innerHTML = '';
+
+            const filterStatus = document.getElementById('filterRoomStatus').value;
+            const searchKeyword = document.getElementById('searchRoomNumber').value.toLowerCase();
+
+            const isAdmin = currentUser && currentUser.role === 'ADMIN';
+
+            const filtered = allRoomsList.filter(r => {
+                const matchStatus = !filterStatus || r.status === filterStatus;
+                const matchSearch = !searchKeyword || r.roomNumber.toLowerCase().includes(searchKeyword) || r.tier.tierName.toLowerCase().includes(searchKeyword);
+                return matchStatus && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${isAdmin ? 6 : 5}" class="text-center py-4 text-muted">Tidak ada kamar yang sesuai filter.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                let badgeClass = 'badge-available';
+                if (r.status === 'OCCUPIED') badgeClass = 'badge-occupied';
+                if (r.status === 'MAINTENANCE') badgeClass = 'badge-maintenance';
+
+                let adminCol = '';
+                if (isAdmin) {
+                    adminCol = `
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm me-1">
+                                <button class="btn btn-outline-success ${r.status === 'AVAILABLE' ? 'active' : ''}" onclick="quickUpdateRoomStatus(${r.id}, 'AVAILABLE')">Available</button>
+                                <button class="btn btn-outline-danger ${r.status === 'OCCUPIED' ? 'active' : ''}" onclick="quickUpdateRoomStatus(${r.id}, 'OCCUPIED')">Occupied</button>
+                                <button class="btn btn-outline-warning ${r.status === 'MAINTENANCE' ? 'active' : ''}" onclick="quickUpdateRoomStatus(${r.id}, 'MAINTENANCE')">Repair</button>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" title="Edit Kamar" onclick="openEditRoom(${r.id})"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger ms-1" title="Hapus Kamar" onclick="deleteRoom(${r.id})"><i class="bi bi-trash"></i></button>
+                        </td>
+                    `;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="fw-bold fs-6">Kamar ${r.roomNumber}</td>
+                        <td class="fw-semibold text-primary">${r.tier.tierName}</td>
+                        <td>${r.tier.capacity} Orang</td>
+                        <td>Rp ${Number(r.tier.basePrice).toLocaleString('id-ID')}</td>
+                        <td><span class="status-badge ${badgeClass}">${r.status}</span></td>
+                        ${adminCol}
+                    </tr>
+                `;
+            });
+        }
+
+        function filterRoomsTable() {
+            renderRoomsTable();
+        }
+
+        function resetRoomForm() {
+            document.getElementById('roomModalTitle').innerHTML = '<i class="bi bi-door-open-fill text-primary"></i> Tambah Unit Kamar Satuan';
+            document.getElementById('editRoomId').value = '';
+            document.getElementById('modalRoomNumber').value = '';
+            document.getElementById('modalRoomStatus').value = 'AVAILABLE';
+            document.getElementById('btnSaveRoom').textContent = 'Simpan Unit Kamar';
+        }
+
+        function openEditRoom(roomId) {
+            const room = allRoomsList.find(r => r.id === roomId);
+            if (!room) return;
+            document.getElementById('roomModalTitle').innerHTML = '<i class="bi bi-pencil-square text-primary"></i> Edit Unit Kamar';
+            document.getElementById('editRoomId').value = room.id;
+            document.getElementById('modalRoomNumber').value = room.roomNumber;
+            document.getElementById('modalRoomTierSelect').value = room.tier.id;
+            document.getElementById('modalRoomStatus').value = room.status;
+            document.getElementById('btnSaveRoom').textContent = 'Perbarui Kamar';
+            new bootstrap.Modal(document.getElementById('roomModal')).show();
+        }
+
+        async function handleSaveRoom(e) {
+            e.preventDefault();
+            const id = document.getElementById('editRoomId').value;
+            const roomNumber = document.getElementById('modalRoomNumber').value;
+            const tierId = document.getElementById('modalRoomTierSelect').value;
+            const status = document.getElementById('modalRoomStatus').value;
+
+            const url = id ? `${API_BASE}/rooms/${id}` : `${API_BASE}/rooms`;
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const res = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomNumber, tierId, status })
+                });
+
+                if (res.ok) {
+                    alert('Data kamar berhasil disimpan!');
+                    bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
+                    loadRooms();
+                    loadTiers();
+                    fetchAvailableRoomsByDate();
+                    if (currentUser && currentUser.role === 'ADMIN') loadStats();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Gagal menyimpan kamar');
+                }
+            } catch (e) {
+                alert('Kesalahan koneksi');
+            }
+        }
+
+        async function quickUpdateRoomStatus(roomId, newStatus) {
+            try {
+                const res = await fetch(`${API_BASE}/rooms/${roomId}/status?status=${newStatus}`, { method: 'PUT' });
+                if (res.ok) {
+                    loadRooms();
+                    loadTiers();
+                    fetchAvailableRoomsByDate();
+                    if (currentUser && currentUser.role === 'ADMIN') loadStats();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Gagal mengubah status');
+                }
+            } catch (e) {
+                alert('Kesalahan jaringan');
+            }
+        }
+
+        async function deleteRoom(id) {
+            if (!confirm('Yakin ingin menghapus unit kamar ini?')) return;
+            const res = await fetch(`${API_BASE}/rooms/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadRooms();
+                loadTiers();
+                fetchAvailableRoomsByDate();
+                if (currentUser && currentUser.role === 'ADMIN') loadStats();
+            } else {
+                const err = await res.json();
+                alert(err.message || 'Gagal menghapus kamar');
+            }
+        }
+
+        // ================= 4. PERSETUJUAN RESERVASI (ACCEPT / REJECT) =================
+        async function loadReservations() {
+            const tbody = document.getElementById('historyTableBody');
+            const historyBadge = document.getElementById('historyRoleBadge');
+            const historySub = document.getElementById('historySubText');
+
+            if (!currentUser) {
+                historyBadge.textContent = 'Mode Tamu';
+                historyBadge.className = 'badge bg-secondary rounded-pill px-3 py-2';
+                historySub.textContent = 'Silakan masuk untuk melihat transaksi pemesanan Anda';
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-muted">Silakan masuk untuk mengakses riwayat reservasi Anda.</td></tr>`;
+                return;
+            }
+
+            if (currentUser.role === 'ADMIN') {
+                historyBadge.textContent = 'Manajemen Persetujuan & Transaksi (Admin)';
+                historyBadge.className = 'badge bg-danger rounded-pill px-3 py-2';
+                historySub.textContent = 'Tinjau pesanan masuk tamu: Accept untuk setujui, Reject untuk tolak';
+            } else {
+                historyBadge.textContent = 'Pesanan Saya (' + currentUser.fullName + ')';
+                historyBadge.className = 'badge bg-primary rounded-pill px-3 py-2';
+                historySub.textContent = 'Daftar riwayat reservasi Anda beserta status persetujuan dari Admin';
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/reservations`);
+                allHistoryList = await res.json();
+                renderHistoryTable();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+
+            const keyword = document.getElementById('searchBookingCode').value.toLowerCase();
+            const isAdmin = currentUser && currentUser.role === 'ADMIN';
+
+            const filtered = allHistoryList.filter(r => {
+                return !keyword || r.bookingCode.toLowerCase().includes(keyword) || r.user.fullName.toLowerCase().includes(keyword);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Belum ada catatan reservasi.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(r => {
+                let badgeClass = 'badge-pending';
+                if (r.status === 'CONFIRMED') badgeClass = 'badge-confirmed';
+                if (r.status === 'CANCELLED') badgeClass = 'badge-cancelled';
+                if (r.status === 'COMPLETED') badgeClass = 'badge-completed';
+
+                let actionBtns = `
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="viewInvoice(${r.id})">
+                        <i class="bi bi-file-text"></i> Invoice
+                    </button>
+                `;
+
+                if (isAdmin) {
+                    if (r.status === 'PENDING') {
+                        actionBtns += `
+                            <button class="btn btn-sm btn-success rounded-pill ms-1 fw-semibold" onclick="handleDecision(${r.id}, 'CONFIRMED')" title="Setujui Pesanan">
+                                <i class="bi bi-check-lg"></i> Accept
+                            </button>
+                            <button class="btn btn-sm btn-danger rounded-pill ms-1 fw-semibold" onclick="handleDecision(${r.id}, 'CANCELLED')" title="Tolak Pesanan">
+                                <i class="bi bi-x-lg"></i> Reject
+                            </button>
+                        `;
+                    } else if (r.status === 'CONFIRMED') {
+                        actionBtns += `
+                            <button class="btn btn-sm btn-outline-info rounded-pill ms-1" onclick="handleDecision(${r.id}, 'COMPLETED')">
+                                Selesai
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill ms-1" onclick="handleDecision(${r.id}, 'CANCELLED')">
+                                Batal
+                            </button>
+                        `;
+                    }
+                } else {
+                    if (r.status === 'PENDING' || r.status === 'CONFIRMED') {
+                        actionBtns += `
+                            <button class="btn btn-sm btn-outline-danger rounded-pill ms-1" onclick="cancelReservationByCustomer(${r.id})">
+                                Batalkan
+                            </button>
+                        `;
+                    }
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="fw-bold text-primary font-monospace">${r.bookingCode}</td>
+                        <td class="fw-semibold">${r.user.fullName}</td>
+                        <td><small class="text-muted">${r.checkInDate} s/d ${r.checkOutDate}</small></td>
+                        <td class="fw-bold text-dark">Rp ${Number(r.totalAmount).toLocaleString('id-ID')}</td>
+                        <td><span class="status-badge ${badgeClass}">${r.status}</span></td>
+                        <td class="text-end">${actionBtns}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterHistoryTable() {
+            renderHistoryTable();
+        }
+
+        async function handleDecision(id, newStatus) {
+            const actionText = newStatus === 'CONFIRMED' ? 'ACCEPT (Menyetujui)' : (newStatus === 'CANCELLED' ? 'REJECT (Menolak)' : 'Menyelesaikan');
+            if (!confirm(`Konfirmasi untuk ${actionText} pesanan ini?`)) return;
+
+            const res = await fetch(`${API_BASE}/reservations/${id}/status?status=${newStatus}`, { method: 'PUT' });
+            if (res.ok) {
+                loadReservations();
+                loadRooms();
+                loadTiers();
+                fetchAvailableRoomsByDate();
+                if (currentUser && currentUser.role === 'ADMIN') loadStats();
+            } else {
+                const err = await res.json();
+                alert(err.message || 'Gagal memperbarui status');
+            }
+        }
+
+        async function cancelReservationByCustomer(id) {
+            if (!confirm('Yakin ingin membatalkan pengajuan reservasi ini?')) return;
+            const res = await fetch(`${API_BASE}/reservations/${id}/status?status=CANCELLED`, { method: 'PUT' });
+            if (res.ok) {
+                loadReservations();
+                loadRooms();
+                loadTiers();
+                fetchAvailableRoomsByDate();
+            } else {
+                const err = await res.json();
+                alert(err.message || 'Gagal membatalkan pesanan');
+            }
+        }
+
+        async function viewInvoice(resId) {
+            const res = allHistoryList.find(r => r.id === resId);
+            if (!res) return;
+
+            document.getElementById('invCode').textContent = res.bookingCode;
+            document.getElementById('invStatus').textContent = res.status;
+            
+            let statusClass = 'bg-warning text-dark';
+            if (res.status === 'CONFIRMED') statusClass = 'bg-success text-white';
+            if (res.status === 'CANCELLED') statusClass = 'bg-danger text-white';
+            if (res.status === 'COMPLETED') statusClass = 'bg-primary text-white';
+            document.getElementById('invStatus').className = `badge ${statusClass}`;
+
+            document.getElementById('invGuestName').textContent = res.user.fullName;
+            document.getElementById('invGuestEmail').textContent = res.user.email;
+            document.getElementById('invCheckIn').textContent = res.checkInDate;
+            document.getElementById('invCheckOut').textContent = res.checkOutDate;
+            document.getElementById('invTotalAmount').textContent = `Rp ${Number(res.totalAmount).toLocaleString('id-ID')}`;
+
+            const itemsRes = await fetch(`${API_BASE}/reservations/${resId}/items`);
+            const items = await itemsRes.json();
+            const invItemsTable = document.getElementById('invItemsTable');
+            invItemsTable.innerHTML = '';
+
+            items.forEach(it => {
+                invItemsTable.innerHTML += `
+                    <tr>
+                        <td class="fw-bold">Kamar ${it.room.roomNumber}</td>
+                        <td>${it.room.tier.tierName}</td>
+                        <td class="text-end">Rp ${Number(it.pricePerNight).toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            });
+
+            new bootstrap.Modal(document.getElementById('invoiceModal')).show();
+        }
+
+        // ================= 5. ADMIN ANALYTICS & USERS =================
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API_BASE}/reservations/stats`);
+                if (res.ok) {
+                    const stats = await res.json();
+                    document.getElementById('statRevenue').textContent = `Rp ${Number(stats.totalRevenue).toLocaleString('id-ID')}`;
+                    document.getElementById('statBookings').textContent = stats.totalBookings;
+                    document.getElementById('statPendingBookings').textContent = stats.pendingBookings;
+                    document.getElementById('statActiveBookings').textContent = stats.activeBookings;
+                    document.getElementById('statAvailableRooms').textContent = stats.availableRooms;
+                    document.getElementById('statTotalStock').textContent = `${stats.totalRooms} Unit`;
+
+                    const totalRooms = stats.totalRooms || 1;
+                    const occupancy = Math.round((stats.occupiedRooms / totalRooms) * 100);
+                    document.getElementById('statOccupancy').textContent = `${occupancy}%`;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const res = await fetch(`${API_BASE}/users`);
+                if (res.ok) {
+                    const users = await res.json();
+                    const tbody = document.getElementById('usersTableBody');
+                    tbody.innerHTML = '';
+
+                    users.forEach(u => {
+                        const roleBadge = u.role === 'ADMIN' ? 'bg-danger' : 'bg-primary';
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${u.id}</td>
+                                <td class="fw-bold">${u.fullName}</td>
+                                <td>${u.username}</td>
+                                <td>${u.email}</td>
+                                <td><span class="badge ${roleBadge} rounded-pill">${u.role}</span></td>
+                                <td class="small text-muted">${new Date(u.createdAt).toLocaleDateString('id-ID')}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function handleAdminAddUser(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('adminUserFullName').value;
+            const username = document.getElementById('adminUserUsername').value;
+            const email = document.getElementById('adminUserEmail').value;
+            const password = document.getElementById('adminUserPassword').value;
+            const role = document.getElementById('adminUserRole').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/users/create-by-admin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, username, email, password, role })
+                });
+
+                if (res.ok) {
+                    alert('Pengguna baru berhasil ditambahkan!');
+                    document.getElementById('adminAddUserForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('adminAddUserModal')).hide();
+                    loadUsers();
+                    loadStats();
+                } else {
+                    const err = await res.json();
+                    alert(err.message || 'Gagal menambahkan user');
+                }
+            } catch (err) {
+                alert('Kesalahan koneksi');
+            }
+        }
+    </script>
+</body>
+</html>
